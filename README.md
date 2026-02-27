@@ -1,7 +1,6 @@
 # BlogPlatform.API
 
-API RESTful para plataforma de blog desenvolvida com ASP.NET Core, em um padrão de arquitetura simplificado para facilitar o estudo e a minha evolução prática dos conceitos aprendidos em .NET, aplicando boas práticas de arquitetura, segurança e organização de código.  
-A API está sendo construída de forma incremental, com o objetivo de construir uma API sólida, escalável e preparada para evoluir para um produto real.
+API RESTful para plataforma de blog desenvolvida com ASP.NET Core, em um padrão de arquitetura simplificado para facilitar o estudo e a minha evolução prática dos conceitos aprendidos em .NET.
 
 ---
 
@@ -154,4 +153,4 @@ Todas as respostas seguem o padrão:
 
 Desenvolvido por **Bruno Eduardo**
 
-Projeto em sensevolvimento.
+Projeto em densevolvimento.

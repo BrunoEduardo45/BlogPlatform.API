@@ -1,9 +1,21 @@
-﻿namespace Blog
+﻿using System.Globalization;
+
+namespace Blog;
+
+public static class Configuration
 {
-    public static class Configuration
+    public static string JwtKey = string.Empty;
+    public static string ApiKeyName = string.Empty;
+    public static string ApiKey = string.Empty;
+    public static SmtpConfiguration Smtp = new();
+
+    public class SmtpConfiguration
     {
-        public static string JwtKey = "ZmVkYWY3ZDg4NjNiNDhlMTk3YjkyODdkNDkyYjcwOGU=";
-        public static string ApiKeyName = "api_key";
-        public static string ApiKey = "blog_api_IlTevUM/z0ey3NwCV/unWg==";
+        public string Host { get; set; } = string.Empty;
+        public int Port { get; set; } = 25;
+        public string UserName { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public string FromName { get; set; } = string.Empty;
+        public string FromEmail { get; set; } = string.Empty;
     }
 }
