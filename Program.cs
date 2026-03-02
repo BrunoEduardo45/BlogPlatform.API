@@ -1,9 +1,15 @@
+using System.IO.Compression;
 using System.Text;
+using System.Text.Json.Serialization;
 using Blog;
 using Blog.Data;
 using Blog.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using DotNetEnv;
+using Microsoft.AspNetCore.ResponseCompression;
+
+Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 LoadConfiguration(builder);
@@ -14,6 +20,7 @@ ConfigureServices(builder);
 var app = builder.Build();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseResponseCompression();
 app.MapControllers();
 app.UseStaticFiles();
 app.Run();
@@ -21,6 +28,8 @@ app.Run();
 
 void LoadConfiguration(WebApplicationBuilder builder)
 {
+    builder.Configuration.AddEnvironmentVariables();
+
     Configuration.JwtKey = builder.Configuration.GetValue<string>("JwtKey") ?? string.Empty;
     Configuration.ApiKeyName = builder.Configuration.GetValue<string>("ApiKeyName") ?? string.Empty;
     Configuration.ApiKey = builder.Configuration.GetValue<string>("ApiKey") ?? string.Empty;
@@ -51,10 +60,27 @@ void ConfigureAuthentication(WebApplicationBuilder builder)
 
 void ConfigureMvc(WebApplicationBuilder builder)
 {
+    builder.Services.AddMemoryCache();
+    builder.Services.AddResponseCompression(options =>
+    {
+        options.Providers.Add<GzipCompressionProvider>();
+    });
+    builder.Services.Configure<GzipCompressionProviderOptions>(options =>
+    {
+        options.Level = CompressionLevel.Optimal;
+    });
     builder
         .Services
         .AddControllers()
-        .ConfigureApiBehaviorOptions(options => { options.SuppressModelStateInvalidFilter = true; });
+        .ConfigureApiBehaviorOptions(options =>
+        {
+            options.SuppressModelStateInvalidFilter = true;
+        })
+        .AddJsonOptions(x =>
+        {
+            x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            x.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+        });
 }
 
 void ConfigureServices(WebApplicationBuilder builder)

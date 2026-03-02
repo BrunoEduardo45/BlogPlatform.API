@@ -4,6 +4,7 @@
 *.suo
 *.cache
 *.log
+*.env
 
 # Build folders
 bin/

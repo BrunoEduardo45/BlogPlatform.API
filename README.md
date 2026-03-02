@@ -4,27 +4,7 @@ API RESTful para plataforma de blog desenvolvida com ASP.NET Core, em um padrão
 
 ---
 
-# Tecnologias Utilizadas
-
-## Até então
-
-- ASP.NET Core
-- Entity Framework Core
-- SQL Server
-- JWT (Json Web Token)
-- Data Annotations
-- Middleware de Autenticação e Autorização
-
-## Próximas
-
-- Swagger / OpenAPI
-- Cache em memória
-- Compressão de resposta
-- Upload de arquivos
-
----
-
-# Objetivo do Projeto
+## Objetivo do Projeto
 
 Construir uma API aplicando:
 
@@ -38,7 +18,27 @@ Construir uma API aplicando:
 
 ---
 
-# Arquitetura Atual
+## Tecnologias Utilizadas
+
+### Até então
+
+- ASP.NET Core
+- Entity Framework Core
+- SQL Server
+- JWT (Json Web Token)
+- Data Annotations
+- Middleware de Autenticação e Autorização
+- Upload de arquivos
+- Cache em memória
+- Compressão de resposta
+
+### Próximas
+
+- Swagger / OpenAPI
+
+---
+
+## Arquitetura Atual
 
 Estrutura organizada por responsabilidades:
 
@@ -52,20 +52,20 @@ Estrutura organizada por responsabilidades:
 
 ---
 
-# Funcionalidades Implementadas
+## Funcionalidades Implementadas
 
-## Category
+### Category
 
 - CRUD completo
 - Validação com Data Annotations em ViewModels
 - Retorno padronizado
 
-## Users
+### Users
 
 - Entidade User
 - Armazenamento seguro de senha com Hash
 
-## Autenticação
+### Autenticação
 
 - Login via email e senha
 - Geração de JWT
@@ -73,17 +73,29 @@ Estrutura organizada por responsabilidades:
 - Controle de acesso por Roles
 - Proteção de endpoints com `[Authorize]`
 
-## Autenticação Alternativa via API Key
+### Autenticação Alternativa via API Key
 
 - Implementação de atributo personalizado
 - Estratégia alternativa de autenticação
 - Proteção adicional para endpoints específicos
 
+### Performance
+
+- Paginação de dados (Exemplo em Posts)
+- Cache em memória (Exemplo em Categories)
+- Compressão de resposta
+
+### Arquivos Estáticos e Upload
+
+- Suporte a arquivos estáticos
+- Upload de imagens
+- Serviço preparado para envio de e-mails
+
 ---
 
-# Próximos passos
+## Próximos passos
 
-## Configurações e Ambiente
+### Configurações e Ambiente
 
 - Organização do `appsettings.json`
 - Separação por ambiente (Development / Production)
@@ -91,30 +103,20 @@ Estrutura organizada por responsabilidades:
 - Forçando HTTPS
 - Configuração de Connection Strings
 
-## Performance
+### Performance
 
-- Paginação de dados
-- Filtros em queries
-- Cache em memória
-- Compressão de resposta
 - Ajuste de serialização padrão do ASP.NET
 
-## Arquivos Estáticos e Upload
-
-- Suporte a arquivos estáticos
-- Upload de imagens
-- Serviço preparado para envio de e-mails
-
-## Documentação
+### Documentação
 
 - Swagger / OpenAPI habilitado
 - Documentação interativa da API
 
-## Outras funcionalidades que possam surgir durante o desenvolvimento.
+#### Outras funcionalidades que possam surgir durante o desenvolvimento.
 
 ---
 
-# Padronização de Respostas
+## Padronização de Respostas
 
 Todas as respostas seguem o padrão:
 
@@ -149,7 +151,7 @@ Todas as respostas seguem o padrão:
 
 ---
 
-# Autor
+## Autor
 
 Desenvolvido por **Bruno Eduardo**
 
