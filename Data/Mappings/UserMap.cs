@@ -9,18 +9,14 @@ namespace Blog.Data.Mappings
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
-            // Tabela
             builder.ToTable("User");
 
-            // Chave Primária
             builder.HasKey(x => x.Id);
 
-            // Identity
             builder.Property(x => x.Id)
                 .ValueGeneratedOnAdd()
                 .UseIdentityColumn();
 
-            // Propriedades
             builder.Property(x => x.Name)
                 .IsRequired()
                 .HasColumnName("Name")
@@ -50,12 +46,10 @@ namespace Blog.Data.Mappings
                 .HasColumnType("VARCHAR")
                 .HasMaxLength(80);
 
-            // Índices
             builder
                 .HasIndex(x => x.Slug, "IX_User_Slug")
                 .IsUnique();
 
-            // Relacionamentos
             builder
                 .HasMany(x => x.Roles)
                 .WithMany(x => x.Users)

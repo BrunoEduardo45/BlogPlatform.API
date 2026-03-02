@@ -17,11 +17,7 @@ namespace Blog.Controllers
     public class AccountController : ControllerBase
     {
         [HttpPost("v1/accounts/")]
-        public async Task<IActionResult> Post(
-            [FromBody]RegisterViewModels model, 
-            [FromServices]BlogDataContext context, 
-            [FromServices] EmailService emailService
-        )
+        public async Task<IActionResult> Post([FromBody]RegisterViewModels model, [FromServices]BlogDataContext context, [FromServices] EmailService emailService)
         {
             if (!ModelState.IsValid)
                 return BadRequest(new ResultViewModel<string>(ModelState.GetErrors()));
@@ -89,9 +85,7 @@ namespace Blog.Controllers
 
         [Authorize]
         [HttpPost("v1/accounts/upload-image")]
-        public async Task<IActionResult> UploadImage(
-            [FromBody] UploadImageViewModel model,
-            [FromServices] BlogDataContext context)
+        public async Task<IActionResult> UploadImage([FromBody] UploadImageViewModel model, [FromServices] BlogDataContext context)
         {
             var fileName = $"{Guid.NewGuid().ToString()}.jpg";
             var data = new Regex(@"^data:image\/[a-z]+;base64,").Replace(model.Base64Image, "");

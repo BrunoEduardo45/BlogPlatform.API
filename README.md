@@ -20,8 +20,6 @@ Construir uma API aplicando:
 
 ## Tecnologias Utilizadas
 
-### Até então
-
 - ASP.NET Core
 - Entity Framework Core
 - SQL Server
@@ -31,9 +29,6 @@ Construir uma API aplicando:
 - Upload de arquivos
 - Cache em memória
 - Compressão de resposta
-
-### Próximas
-
 - Swagger / OpenAPI
 
 ---
@@ -91,28 +86,17 @@ Estrutura organizada por responsabilidades:
 - Upload de imagens
 - Serviço preparado para envio de e-mails
 
----
-
-## Próximos passos
-
 ### Configurações e Ambiente
 
 - Organização do `appsettings.json`
 - Separação por ambiente (Development / Production)
-- Uso de `IConfiguration`
 - Forçando HTTPS
 - Configuração de Connection Strings
-
-### Performance
-
-- Ajuste de serialização padrão do ASP.NET
 
 ### Documentação
 
 - Swagger / OpenAPI habilitado
 - Documentação interativa da API
-
-#### Outras funcionalidades que possam surgir durante o desenvolvimento.
 
 ---
 
@@ -156,3 +140,4 @@ Todas as respostas seguem o padrão:
 Desenvolvido por **Bruno Eduardo**
 
 Projeto em densevolvimento.
+Codigo e commits criados em inglês para prática e evolução do idioma.
