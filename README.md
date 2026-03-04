@@ -139,5 +139,4 @@ Todas as respostas seguem o padrão:
 
 Desenvolvido por **Bruno Eduardo**
 
-Projeto em densevolvimento.
 Codigo e commits criados em inglês para prática e evolução do idioma.

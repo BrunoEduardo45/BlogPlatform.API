@@ -1,8 +1,10 @@
-using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Blog.Models
 {
+    [Index(nameof(Slug), IsUnique = true)]
     public class User
     {
         public int Id { get; set; }

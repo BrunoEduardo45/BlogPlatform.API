@@ -7,6 +7,7 @@ namespace Blog.Controllers
     [Route("")]
     public class HomeController : ControllerBase
     {
+        // API Test
         [HttpGet("/")]
         [ApiKey]
         public IActionResult Get()

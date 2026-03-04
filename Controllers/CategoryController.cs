@@ -3,6 +3,7 @@ using Blog.Extensions;
 using Blog.Models;
 using Blog.ViewModels;
 using Blog.ViewModels.Categories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -13,6 +14,8 @@ namespace Blog.Controllers
     [ApiController]
     public class CategoryController : ControllerBase
     {
+        #region Queries
+
         private List<Category> GetCategories(BlogDataContext context)
         {
             return context.Categories.ToList();
@@ -37,14 +40,14 @@ namespace Blog.Controllers
             }
         }
 
-        [HttpGet("v1/categories/{id}")]
-        public async Task<IActionResult> GetByIdAsync([FromRoute] int id, [FromServices] BlogDataContext context)
+        [HttpGet("v1/categories/{slug}")]
+        public async Task<IActionResult> GetByIdAsync([FromRoute] string slug, [FromServices] BlogDataContext context)
         {
             try
             {
                 var category = await context
                     .Categories
-                    .FirstOrDefaultAsync(x => x.Id == id);
+                    .FirstOrDefaultAsync(x => x.Slug == slug);
 
                 if (category == null)
                     return NotFound(new ResultViewModel<Category>("Conteúdo não encontrado"));
@@ -57,6 +60,11 @@ namespace Blog.Controllers
             }
         }
 
+        #endregion
+
+        #region Commands
+
+        [Authorize(Roles = "admin,author")]
         [HttpPost("v1/categories")]
         public async Task<IActionResult> PostAsync([FromBody] EditorCategoryViewModel model, [FromServices] BlogDataContext context)
         {
@@ -86,6 +94,7 @@ namespace Blog.Controllers
             }
         }
 
+        [Authorize(Roles = "admin,author")]
         [HttpPut("v1/categories/{id}")]
         public async Task<IActionResult> PutAsync([FromRoute] int id, [FromBody] EditorCategoryViewModel model, [FromServices] BlogDataContext context)
         {
@@ -116,6 +125,7 @@ namespace Blog.Controllers
             }
         }
 
+        [Authorize(Roles = "admin,author")]
         [HttpDelete("v1/categories/{id}")]
         public async Task<IActionResult> DeleteAsync([FromRoute] int id, [FromServices] BlogDataContext context)
         {
@@ -127,6 +137,14 @@ namespace Blog.Controllers
 
                 if (category == null)
                     return NotFound(new ResultViewModel<Category>("Conteúdo não encontrado"));
+
+                var hasPosts = await context.Posts
+                    .AnyAsync(x => x.Category.Id == id);
+
+                if (hasPosts)
+                    return BadRequest(
+                        new ResultViewModel<Category>(
+                            "Categoria vinculada a posts"));
 
                 context.Categories.Remove(category);
                 await context.SaveChangesAsync();
@@ -142,5 +160,7 @@ namespace Blog.Controllers
                 return StatusCode(500, new ResultViewModel<Category>("05X12 - Falha interna no servidor"));
             }
         }
+
+        #endregion
     }
 }

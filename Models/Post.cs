@@ -1,8 +1,10 @@
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 
 namespace Blog.Models
 {
+    [Index(nameof(Slug), IsUnique = true)]
     public class Post
     {
         public int Id { get; set; }
