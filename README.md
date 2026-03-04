@@ -15,6 +15,7 @@ Construir uma API aplicando:
 - Autenticação e autorização seguras
 - Organização de configurações por ambiente
 - Preocupação com performance
+- Implementação completa de controle de acesso baseado em Roles
 
 ---
 
@@ -29,6 +30,7 @@ Construir uma API aplicando:
 - Upload de arquivos
 - Cache em memória
 - Compressão de resposta
+- SecureIdentity.Password
 - Swagger / OpenAPI
 
 ---
@@ -53,12 +55,42 @@ Estrutura organizada por responsabilidades:
 
 - CRUD completo
 - Validação com Data Annotations em ViewModels
+- Cache em memória
 - Retorno padronizado
 
-### Users
+### Tags
 
-- Entidade User
+- CRUD completo
+- Associação e remoção de Tags em Posts
+- Validação para impedir exclusão com relacionamento
+
+### Posts
+
+- CRUD completo
+- Paginação
+- Filtro por Categoria
+- Filtro por Tag
+- Controle de edição por autor ou admin
+
+### Users / Accounts
+
+- Registro de usuário
+- Login com geração de JWT
+- Logout
+- Atualização de dados
+- Remoção de conta (com validação de permissão)
+- Listagem de usuários (admin)
+- Consulta por Id
+- Consulta por Role
+- Upload e validação de imagem de perfil
 - Armazenamento seguro de senha com Hash
+
+### Roles
+
+- CRUD completo
+- Associação e remoção de Roles em usuários
+- Controle de acesso baseado em Role (admin / author)
+- Proteção contra remoção da role admin
 
 ### Autenticação
 
