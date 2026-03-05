@@ -24,6 +24,10 @@ namespace Blog.Data
             modelBuilder.ApplyConfiguration(new PostMap());
             modelBuilder.ApplyConfiguration(new TagMap());
             modelBuilder.ApplyConfiguration(new RoleMap());
+
+            base.OnModelCreating(modelBuilder);
+
+            BlogDataContextSeed.Seed(modelBuilder);
         }
     }
 }

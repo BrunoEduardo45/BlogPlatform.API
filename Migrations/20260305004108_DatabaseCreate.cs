@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace Blog.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateDB : Migration
+    public partial class DatabaseCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -31,8 +33,8 @@ namespace Blog.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Slug = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "NVARCHAR(MAX)", nullable: false),
+                    Slug = table.Column<string>(type: "NVARCHAR(MAX)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -45,8 +47,8 @@ namespace Blog.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Slug = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "NVARCHAR(40)", maxLength: 40, nullable: false),
+                    Slug = table.Column<string>(type: "VARCHAR(40)", maxLength: 40, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -60,11 +62,11 @@ namespace Blog.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "NVARCHAR(80)", maxLength: 80, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Image = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "VARCHAR(160)", maxLength: 160, nullable: false),
+                    PasswordHash = table.Column<string>(type: "VARCHAR(255)", maxLength: 255, nullable: false),
+                    Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Slug = table.Column<string>(type: "VARCHAR(80)", maxLength: 80, nullable: false),
-                    Bio = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Bio = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -139,17 +141,65 @@ namespace Blog.Migrations
                     table.PrimaryKey("PK_PostTag", x => new { x.PostId, x.TagId });
                     table.ForeignKey(
                         name: "FK_PostRole_PostId",
-                        column: x => x.PostId,
+                        column: x => x.TagId,
                         principalTable: "Tag",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_PostTag_TagId",
-                        column: x => x.TagId,
+                        column: x => x.PostId,
                         principalTable: "Post",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.InsertData(
+                table: "Category",
+                columns: new[] { "Id", "Name", "Slug" },
+                values: new object[,]
+                {
+                    { 1, "Backend", "backend" },
+                    { 2, "Frontend", "frontend" },
+                    { 3, "DevOps", "devops" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Role",
+                columns: new[] { "Id", "Name", "Slug" },
+                values: new object[,]
+                {
+                    { 1, "Administrador", "admin" },
+                    { 2, "Autor", "author" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Tag",
+                columns: new[] { "Id", "Name", "Slug" },
+                values: new object[,]
+                {
+                    { 1, "ASP.NET", "aspnet" },
+                    { 2, "CSharp", "csharp" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "User",
+                columns: new[] { "Id", "Bio", "Email", "Image", "Name", "PasswordHash", "Slug" },
+                values: new object[] { 1, "Administrador do sistema", "admin@blog.com", null, "Admin", "HASH_FIXO_AQUI", "admin" });
+
+            migrationBuilder.InsertData(
+                table: "Post",
+                columns: new[] { "Id", "AuthorId", "Body", "CategoryId", "CreateDate", "LastUpdateDate", "Slug", "Summary", "Title" },
+                values: new object[] { 1, 1, "Conteúdo completo do primeiro post.", 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "primeiro-post", "Post inicial de exemplo", "Primeiro Post do Sistema" });
+
+            migrationBuilder.InsertData(
+                table: "UserRole",
+                columns: new[] { "RoleId", "UserId" },
+                values: new object[] { 1, 1 });
+
+            migrationBuilder.InsertData(
+                table: "PostTag",
+                columns: new[] { "PostId", "TagId" },
+                values: new object[] { 1, 1 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Category_Slug",
@@ -177,6 +227,18 @@ namespace Blog.Migrations
                 name: "IX_PostTag_TagId",
                 table: "PostTag",
                 column: "TagId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Role_Slug",
+                table: "Role",
+                column: "Slug",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tag_Slug",
+                table: "Tag",
+                column: "Slug",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_User_Slug",

@@ -7,6 +7,7 @@ using Blog.ViewModels.Posts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Blog.Controllers
@@ -23,12 +24,26 @@ namespace Blog.Controllers
 
             try
             {
-                var count = await context.Posts.AsNoTracking().CountAsync();
-                var posts = await context
+                var baseQuery = context
                     .Posts
                     .AsNoTracking()
                     .Include(x => x.Category)
                     .Include(x => x.Author)
+                    .AsQueryable();
+
+                if (!string.IsNullOrWhiteSpace(query.Search))
+                {
+                    baseQuery = baseQuery.Where(x =>
+                        x.Title.ToLower().Contains(query.Search) ||
+                        x.Body.ToLower().Contains(query.Search));
+                }
+
+                var count = await baseQuery.CountAsync();
+
+                var posts = await baseQuery
+                    .OrderByDescending(x => x.LastUpdateDate)
+                    .Skip((query.Page - 1) * query.PageSize)
+                    .Take(query.PageSize)
                     .Select(x => new ListPostsViewModel
                     {
                         Id = x.Id,
@@ -38,9 +53,6 @@ namespace Blog.Controllers
                         Category = x.Category.Name,
                         Author = $"{x.Author.Name} ({x.Author.Email})"
                     })
-                    .OrderByDescending(x => x.LastUpdateDate)
-                    .Skip((query.Page -1) * query.PageSize)
-                    .Take(query.PageSize)
                     .ToListAsync();
 
                 return Ok(new ResultViewModel<dynamic>(new
@@ -51,9 +63,9 @@ namespace Blog.Controllers
                     posts
                 }));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, 
+                return StatusCode(500,
                     new ResultViewModel<List<Post>>("05XE9 - Falha interna no servidor."));
             }
         }
@@ -175,6 +187,8 @@ namespace Blog.Controllers
                     new ResultViewModel<List<Tag>>("05X05 - Falha interna no servidor"));
             }
         }
+
+
 
         #endregion
 

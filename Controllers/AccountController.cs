@@ -169,22 +169,23 @@ namespace Blog.Controllers
         }
 
         [Authorize]
-        [HttpPut("v1/accounts/{id:int}")]
-        public async Task<IActionResult> Put([FromRoute] int id, [FromBody] RegisterViewModels model, [FromServices] BlogDataContext context)
+        [HttpPut("v1/accounts/update-profile/{id:int}")]
+        public async Task<IActionResult> UpdateProfile([FromRoute] int id, [FromBody] UpdateViewModels model, [FromServices] BlogDataContext context)
         {
             if (!ModelState.IsValid)
                 return BadRequest(new ResultViewModel<User>(ModelState.GetErrors()));
 
-            var user = await context.Users.FirstOrDefaultAsync(x => x.Id == id);
+            var email = User.Identity?.Name;
+
+            var user = await context
+                .Users
+                .FirstOrDefaultAsync(x => x.Email == email);
 
             if (user == null)
-                return NotFound(new ResultViewModel<User>("Usuário não encontrado"));
+                return NotFound(new ResultViewModel<string>("Usuário não encontrado"));
 
-            if (!User.IsInRole("admin") && user.Email != User.Identity.Name)
-                return Forbid();
-
-            user.Name = model.Name;
-            user.Email = model.Email;
+            user.Name = model.Name.Trim();
+            user.Bio = model.Bio.Trim();
 
             try
             {
@@ -201,29 +202,34 @@ namespace Blog.Controllers
         }
 
         [Authorize]
-        [HttpDelete("v1/accounts/{id:int}")]
-        public async Task<IActionResult> Delete([FromRoute] int id, [FromServices] BlogDataContext context)
+        [HttpPut("v1/accounts/change-password")]
+        public async Task<IActionResult> ChangePassword([FromServices] BlogDataContext context, [FromBody] ChangePasswordViewModel model)
         {
-            var user = await context.Users.FirstOrDefaultAsync(x => x.Id == id);
+            if (!ModelState.IsValid)
+                return BadRequest(new ResultViewModel<string>(ModelState.GetErrors()));
+
+            var email = User.Identity?.Name;
+
+            var user = await context
+                .Users
+                .FirstOrDefaultAsync(x => x.Email == email);
 
             if (user == null)
-                return NotFound(new ResultViewModel<User>("Usuário não encontrado"));
+                return NotFound(new ResultViewModel<string>("Usuário não encontrado"));
 
-            if (!User.IsInRole("admin") && user.Email != User.Identity.Name)
-                return Forbid();
+            if (!PasswordHasher.Verify(user.PasswordHash, model.CurrentPassword))
+                return BadRequest(new ResultViewModel<string>("Senha atual inválida"));
 
-            try
-            {
-                context.Users.Remove(user);
-                await context.SaveChangesAsync();
+            if (!IsPasswordStrong(model.NewPassword))
+                return BadRequest(new ResultViewModel<string>(
+                    "A nova senha deve conter pelo menos 8 caracteres, letra maiúscula, minúscula e número"));
 
-                return Ok(new ResultViewModel<User>(user));
-            }
-            catch
-            {
-                return StatusCode(500,
-                    new ResultViewModel<User>("05X64 - Falha ao remover usuário"));
-            }
+            user.PasswordHash = PasswordHasher.Hash(model.NewPassword);
+
+            context.Users.Update(user);
+            await context.SaveChangesAsync();
+
+            return Ok(new ResultViewModel<string>("Senha alterada com sucesso"));
         }
 
         [Authorize]
@@ -236,7 +242,8 @@ namespace Blog.Controllers
             if (!model.Base64Image.StartsWith("data:image/"))
                 return BadRequest(new ResultViewModel<string>("Formato de imagem inválido"));
 
-            var fileName = $"{Guid.NewGuid()}.jpg";
+            var extension = model.Base64Image.Contains("png") ? ".png" : ".jpg";
+            var fileName = $"{Guid.NewGuid()}.{extension}";
             var data = new Regex(@"^data:image\/[a-z]+;base64,")
                 .Replace(model.Base64Image, "");
             var bytes = Convert.FromBase64String(data);
@@ -244,8 +251,21 @@ namespace Blog.Controllers
             if (bytes.Length > 5 * 1024 * 1024)
                 return BadRequest(new ResultViewModel<string>("Imagem muito grande (máx 5MB)"));
 
+            var user = await context.Users
+                .FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+
+            if (user == null)
+                return NotFound(new ResultViewModel<User>("Usuário não encontrado"));
+
             try
             {
+                if (!string.IsNullOrEmpty(user.Image))
+                {
+                    var oldPath = user.Image.Replace("https://localhost:0000/", "");
+                    if (System.IO.File.Exists(oldPath))
+                        System.IO.File.Delete(oldPath);
+                }
+
                 await System.IO.File.WriteAllBytesAsync(
                     $"wwwroot/images/{fileName}", bytes);
             }
@@ -255,7 +275,7 @@ namespace Blog.Controllers
                     new ResultViewModel<string>("05X65 - Falha ao salvar imagem"));
             }
 
-            var user = await context.Users
+            user = await context.Users
                 .FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
 
             if (user == null)
@@ -275,6 +295,53 @@ namespace Blog.Controllers
             }
 
             return Ok(new ResultViewModel<string>("Imagem alterada com sucesso!"));
+        }
+
+        [Authorize]
+        [HttpDelete("v1/accounts/{id:int}")]
+        public async Task<IActionResult> Delete([FromRoute] int id, [FromServices] BlogDataContext context)
+        {
+            var user = await context.Users.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (user == null)
+                return NotFound(new ResultViewModel<User>("Usuário não encontrado"));
+
+            if (!User.IsInRole("admin") && user.Email != User.Identity.Name)
+                return Forbid();
+
+            if (user.Roles.Any(r => r.Slug == "admin"))
+            {
+                var adminCount = await context.Users
+                    .CountAsync(u => u.Roles.Any(r => r.Slug == "admin"));
+
+                if (adminCount <= 1) return BadRequest(
+                    new ResultViewModel<User>("Não é possível remover o único administrador do sistema"));
+            }
+
+            try
+            {
+                context.Users.Remove(user);
+                await context.SaveChangesAsync();
+
+                return Ok(new ResultViewModel<User>(user));
+            }
+            catch
+            {
+                return StatusCode(500,
+                    new ResultViewModel<User>("05X64 - Falha ao remover usuário"));
+            }
+        }
+
+        #endregion
+
+        #region Validations
+
+        private bool IsPasswordStrong(string password)
+        {
+            return password.Length >= 8 &&
+                   password.Any(char.IsUpper) &&
+                   password.Any(char.IsLower) &&
+                   password.Any(char.IsDigit);
         }
 
         #endregion

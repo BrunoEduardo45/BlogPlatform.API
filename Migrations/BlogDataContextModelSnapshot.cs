@@ -44,10 +44,33 @@ namespace Blog.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
                     b.HasIndex(new[] { "Slug" }, "IX_Category_Slug")
                         .IsUnique();
 
                     b.ToTable("Category", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Backend",
+                            Slug = "backend"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Frontend",
+                            Slug = "frontend"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "DevOps",
+                            Slug = "devops"
+                        });
                 });
 
             modelBuilder.Entity("Blog.Models.Post", b =>
@@ -96,10 +119,27 @@ namespace Blog.Migrations
 
                     b.HasIndex("CategoryId");
 
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
                     b.HasIndex(new[] { "Slug" }, "IX_Post_Slug")
                         .IsUnique();
 
                     b.ToTable("Post", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AuthorId = 1,
+                            Body = "Conteúdo completo do primeiro post.",
+                            CategoryId = 1,
+                            CreateDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LastUpdateDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Slug = "primeiro-post",
+                            Summary = "Post inicial de exemplo",
+                            Title = "Primeiro Post do Sistema"
+                        });
                 });
 
             modelBuilder.Entity("Blog.Models.Role", b =>
@@ -112,15 +152,32 @@ namespace Blog.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR(MAX)");
 
                     b.Property<string>("Slug")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR(MAX)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Role");
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.ToTable("Role", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Administrador",
+                            Slug = "admin"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Autor",
+                            Slug = "author"
+                        });
                 });
 
             modelBuilder.Entity("Blog.Models.Tag", b =>
@@ -133,15 +190,36 @@ namespace Blog.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(40)
+                        .HasColumnType("NVARCHAR")
+                        .HasColumnName("Name");
 
                     b.Property<string>("Slug")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(40)
+                        .HasColumnType("VARCHAR")
+                        .HasColumnName("Slug");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tag");
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.ToTable("Tag", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "ASP.NET",
+                            Slug = "aspnet"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "CSharp",
+                            Slug = "csharp"
+                        });
                 });
 
             modelBuilder.Entity("Blog.Models.User", b =>
@@ -153,15 +231,15 @@ namespace Blog.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Bio")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(160)
+                        .HasColumnType("VARCHAR")
+                        .HasColumnName("Email");
 
                     b.Property<string>("Image")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -172,7 +250,9 @@ namespace Blog.Migrations
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("VARCHAR")
+                        .HasColumnName("PasswordHash");
 
                     b.Property<string>("Slug")
                         .IsRequired()
@@ -182,10 +262,24 @@ namespace Blog.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
                     b.HasIndex(new[] { "Slug" }, "IX_User_Slug")
                         .IsUnique();
 
                     b.ToTable("User", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Bio = "Administrador do sistema",
+                            Email = "admin@blog.com",
+                            Name = "Admin",
+                            PasswordHash = "HASH_FIXO_AQUI",
+                            Slug = "admin"
+                        });
                 });
 
             modelBuilder.Entity("PostTag", b =>
@@ -201,6 +295,13 @@ namespace Blog.Migrations
                     b.HasIndex("TagId");
 
                     b.ToTable("PostTag");
+
+                    b.HasData(
+                        new
+                        {
+                            PostId = 1,
+                            TagId = 1
+                        });
                 });
 
             modelBuilder.Entity("UserRole", b =>
@@ -216,6 +317,13 @@ namespace Blog.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserRole");
+
+                    b.HasData(
+                        new
+                        {
+                            RoleId = 1,
+                            UserId = 1
+                        });
                 });
 
             modelBuilder.Entity("Blog.Models.Post", b =>
@@ -241,19 +349,19 @@ namespace Blog.Migrations
 
             modelBuilder.Entity("PostTag", b =>
                 {
-                    b.HasOne("Blog.Models.Tag", null)
+                    b.HasOne("Blog.Models.Post", null)
                         .WithMany()
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("FK_PostRole_PostId");
+                        .HasConstraintName("FK_PostTag_TagId");
 
-                    b.HasOne("Blog.Models.Post", null)
+                    b.HasOne("Blog.Models.Tag", null)
                         .WithMany()
                         .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("FK_PostTag_TagId");
+                        .HasConstraintName("FK_PostRole_PostId");
                 });
 
             modelBuilder.Entity("UserRole", b =>

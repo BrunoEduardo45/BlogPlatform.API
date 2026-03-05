@@ -2,6 +2,8 @@
 
 API RESTful para plataforma de blog desenvolvida com ASP.NET Core, em um padrão de arquitetura simplificado para facilitar o estudo e a minha evolução prática dos conceitos aprendidos em .NET.
 
+Esta versão inclui melhorias estruturais, segurança aprimorada, seed inicial automatizado, estratégias de cache e refinamentos na documentação da API, aproximando o projeto de um cenário mais próximo de produção.
+
 ---
 
 ## Objetivo do Projeto
@@ -16,6 +18,7 @@ Construir uma API aplicando:
 - Organização de configurações por ambiente
 - Preocupação com performance
 - Implementação completa de controle de acesso baseado em Roles
+- Aplicação de boas práticas de segurança e integridade de dados
 
 ---
 
@@ -26,6 +29,7 @@ Construir uma API aplicando:
 - SQL Server
 - JWT (Json Web Token)
 - Data Annotations
+- Fluent API
 - Middleware de Autenticação e Autorização
 - Upload de arquivos
 - Cache em memória
@@ -42,7 +46,7 @@ Estrutura organizada por responsabilidades:
 - **Controllers**
 - **Models** (Entidades)
 - **ViewModels** (entrada e saída)
-- **Data** (DbContext + Mappings (Fluent API))
+- **Data** (DbContext + Mappings (Fluent API) + Seed inicial)
 - **Extensions** (padronização de respostas, tratamento de erros, extração e leitura das "Claims")
 - **Services** (Autenticação / Token)
 - **Configuration** (Configurações de ambiente, JWT, etc)
@@ -54,7 +58,7 @@ Estrutura organizada por responsabilidades:
 ### Category
 
 - CRUD completo
-- Validação com Data Annotations em ViewModels
+- Validação com Data Annotations
 - Cache em memória
 - Retorno padronizado
 
@@ -68,22 +72,17 @@ Estrutura organizada por responsabilidades:
 
 - CRUD completo
 - Paginação
-- Filtro por Categoria
-- Filtro por Tag
+- Filtro por Categoria, Tag, Title e Body com suporte a paginação
 - Controle de edição por autor ou admin
 
 ### Users / Accounts
 
-- Registro de usuário
-- Login com geração de JWT
-- Logout
-- Atualização de dados
-- Remoção de conta (com validação de permissão)
-- Listagem de usuários (admin)
-- Consulta por Id
-- Consulta por Role
+- CRUD completo
+- Autenticação com JWT
 - Upload e validação de imagem de perfil
-- Armazenamento seguro de senha com Hash
+- Hash seguro de senha
+- Consulta por Id e Role
+- Validações de permissão (remoção, edição, etc.)
 
 ### Roles
 
@@ -92,38 +91,29 @@ Estrutura organizada por responsabilidades:
 - Controle de acesso baseado em Role (admin / author)
 - Proteção contra remoção da role admin
 
-### Autenticação
+### Segurança
 
-- Login via email e senha
-- Geração de JWT
+- Login com geração de JWT
 - Claims customizadas
-- Controle de acesso por Roles
 - Proteção de endpoints com `[Authorize]`
-
-### Autenticação Alternativa via API Key
-
-- Implementação de atributo personalizado
-- Estratégia alternativa de autenticação
-- Proteção adicional para endpoints específicos
+- Autenticação alternativa via API Key (atributo personalizado)
+- Endpoints internos ocultados do Swagger
 
 ### Performance
 
-- Paginação de dados (Exemplo em Posts)
-- Cache em memória (Exemplo em Categories)
+- Paginação de dados
+- Cache em memória
 - Compressão de resposta
 
-### Arquivos Estáticos e Upload
+### Arquivos e Infraestrutura
 
-- Suporte a arquivos estáticos
 - Upload de imagens
+- Suporte a arquivos estáticos
 - Serviço preparado para envio de e-mails
-
-### Configurações e Ambiente
-
-- Organização do `appsettings.json`
-- Separação por ambiente (Development / Production)
+- Configuração por ambiente (Development / Production)
 - Forçando HTTPS
-- Configuração de Connection Strings
+- Organização de Connection Strings
+- Estrutura preparada para variáveis de ambiente
 
 ### Documentação
 
@@ -166,6 +156,14 @@ Todas as respostas seguem o padrão:
 ```
 
 ---
+
+## Execução do Projeto
+
+Aplicar migrations e seed inicial:
+
+``` Bash
+dotnet ef database update
+```
 
 ## Autor
 
